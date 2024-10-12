@@ -1,30 +1,24 @@
 import os
-from telegram.ext import Updater, CommandHandler #Классы для обработки бота
 from telegram import Update #Для обновлений Телеграмма
-from telegram.ext import CallbackContext #Для передачи контекста между разработчиками
+from telegram.ext import Application, CommandHandler #Классы для обработки бота
 from dotenv import load_dotenv #Загрузка файла с токеном
 
 load_dotenv()
 TOKEN = os.getenv('TELEGRAM_BOT_TOKEN') 
-# print(TOKEN)
 
-updater = Updater(token=TOKEN, use_context=True)
-dispatcher = updater.dispatcher()
+app = Application.builder().token(TOKEN).build()
 
-def start(update: Update, context: CallbackContext):
-    update.message.reply_text('Привет! Я Telegram-бот!')
+async def start(update: Update, context):
+    await update.message.reply_text('Добро пожаловать!')
 
-def help_command(update: Update, context: CallbackContext):
-    update.message.reply_text('Я могу выполнять следующие команды: \n/start - начать общение \n/help - список команд')
+async def help_command(update: Update, context):
+    await update.message.reply_text('Команды для использования:\n /help - Помощь\n/start - Начать работу')
 
 
-start_handler = CommandHandler('start', start)
-help_handler = CommandHandler('help', help_command)
+app.add_handler(CommandHandler('start',start))
+app.add_handler(CommandHandler('help', help_command))
 
-dispatcher.add_handler(start_handler)
-dispatcher.add_handler(help_handler)
 
 if __name__ == '__main__':
-    updater.start_polling()
-    print('Бот активирован!')
-    updater.idle()
+    print('Бот запущен и готов к работе!')
+    app.run_polling()
